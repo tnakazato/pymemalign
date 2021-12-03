@@ -1,2 +1,2 @@
 # pymemalign
-Python wrapper for posix_memalign
+Python wrapper of memory allocation with posix_memalign.
