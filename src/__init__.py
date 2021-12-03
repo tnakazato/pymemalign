@@ -11,6 +11,6 @@ def empty_aligned(shape, dtype=np.float32, order='C', alignment=None):
 
 
 def empty_like_aligned(array, alignment=None):
-    order = 'F' if numpy.isfortran(array) else 'C'
+    order = 'F' if np.isfortran(array) else 'C'
     return empty_aligned(shape=array.shape, dtype=array.dtype,
                          order=order, alignment=alignment)
