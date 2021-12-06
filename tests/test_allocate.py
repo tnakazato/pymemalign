@@ -13,12 +13,14 @@ class TestAllocation(unittest.TestCase):
         pass
 
     def __test_allocate(self, shape, dtypes, expected_type):
-        for t in dtypes:
-            arr = pymemalign.empty_aligned(shape=shape, dtype=t)
-            print(f'expected shape {shape}, actual shape {arr.shape}')
-            print(f'input type {t}, output type {arr.dtype}')
-            self.assertEqual(shape, arr.shape)
-            self.assertEqual(expected_type, arr.dtype)
+        alignments = [32, 64, 128]
+        for a in alignments:
+            for t in dtypes:
+                arr = pymemalign.empty_aligned(shape=shape, dtype=t)
+                print(f'expected shape {shape}, actual shape {arr.shape}')
+                print(f'input type {t}, output type {arr.dtype}')
+                self.assertEqual(shape, arr.shape)
+                self.assertEqual(expected_type, arr.dtype)
 
     def test_allocate_int8(self):
         """Test memory allocation (int8)."""
