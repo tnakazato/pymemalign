@@ -64,8 +64,9 @@ public:
 };
 
 bool isAligned(void *p, size_t alignment) {
-    // TODO: must be implemented
-    return true;
+    uintptr_t addr = reinterpret_cast<uintptr_t>(p);
+    // printf("addr = %lu, align = %lu mod = %lu\n", addr, alignment, addr % alignment);
+    return addr % alignment == 0;
 }
 
 // For numpy array holding aligned pointer
@@ -139,7 +140,7 @@ PyObject *NewUninitializedAlignedPyArray(PyObject *self, PyObject *args) {
     // TODO: this must be obtained from function arg
     size_t alignment = 32u;
 //    printf("REFCOUNT: 0 shape %ld\n", (long)Py_REFCNT(&args[1]));
-    if (!PyArg_ParseTuple(args, "OO", &type, &shape)) {
+    if (!PyArg_ParseTuple(args, "OOl", &type, &shape, &alignment)) {
         return nullptr;
     }
 
