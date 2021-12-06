@@ -79,6 +79,60 @@ void DestructPyCapsuleForNP(PyObject *obj) {
     free(ptr);
 }
 
+bool getTypeInfo(PyObject *type_obj, int &nptype, size_t &element_size) {
+    if (!(PyType_Check(type_obj))) {
+        return false;
+    }
+    PyTypeObject *typeObj = (PyTypeObject *)type_obj;
+    auto const type_name = typeObj->tp_name;
+    if (strcmp(type_name, "numpy.bool") == 0) {
+        nptype = NPY_BOOL;
+        element_size = 8;
+    } else if (strcmp(type_name, "numpy.int8") == 0) {
+        nptype = NPY_INT8;
+        element_size = 8;
+    } else if (strcmp(type_name, "numpy.int16") == 0) {
+        nptype = NPY_INT16;
+        element_size = 16;
+    } else if (strcmp(type_name, "numpy.int32") == 0) {
+        nptype = NPY_INT32;
+        element_size = 32;
+    } else if (strcmp(type_name, "numpy.int64") == 0) {
+        nptype = NPY_INT64;
+        element_size = 64;
+    } else if (strcmp(type_name, "numpy.uint8") == 0) {
+        nptype = NPY_UINT8;
+        element_size = 8;
+    } else if (strcmp(type_name, "numpy.uint16") == 0) {
+        nptype = NPY_UINT16;
+        element_size = 16;
+    } else if (strcmp(type_name, "numpy.uint32") == 0) {
+        nptype = NPY_UINT32;
+        element_size = 32;
+    } else if (strcmp(type_name, "numpy.uint64") == 0) {
+        nptype = NPY_UINT64;
+        element_size = 64;
+    } else if (strcmp(type_name, "numpy.float16") == 0) {
+        nptype = NPY_FLOAT16;
+        element_size = 16;
+    } else if (strcmp(type_name, "numpy.float32") == 0) {
+        nptype = NPY_FLOAT32;
+        element_size = 32;
+    } else if (strcmp(type_name, "numpy.float64") == 0) {
+        nptype = NPY_FLOAT64;
+        element_size = 64;
+    } else if (strcmp(type_name, "numpy.complex64") == 0) {
+        nptype = NPY_COMPLEX64;
+        element_size = 64;
+    } else if (strcmp(type_name, "numpy.complex128") == 0) {
+        nptype = NPY_COMPLEX128;
+        element_size = 128;
+    } else {
+        return false;
+    }
+    return true;
+}
+
 PyObject *NewUninitializedAlignedPyArray(PyObject *self, PyObject *args) {
     PyObject *shape = nullptr;
     PyObject *type = nullptr;
@@ -122,46 +176,8 @@ PyObject *NewUninitializedAlignedPyArray(PyObject *self, PyObject *args) {
     // type mapping
     size_t element_size = 0;
     int nptype = NPY_FLOAT;
-    switch(nptype) {
-    case(NPY_BOOL): {
-        element_size = sizeof(bool);
-    }
-    break;
-    case(NPY_INT8): {
-        element_size = sizeof(int8_t);
-    }
-    break;
-    case(NPY_INT32): {
-        element_size = sizeof(int32_t);
-    }
-    break;
-    case(NPY_INT64): {
-        element_size = sizeof(int64_t);
-    }
-    break;
-    case(NPY_UINT8): {
-        element_size = sizeof(uint8_t);
-    }
-    break;
-    case(NPY_UINT32): {
-        element_size = sizeof(uint32_t);
-    }
-    break;
-    case(NPY_FLOAT): {
-        element_size = sizeof(float);
-    }
-    break;
-    case(NPY_DOUBLE): {
-        element_size = sizeof(double);
-    }
-    break;
-    case(NPY_LONGDOUBLE): {
-        element_size = sizeof(long double);
-    }
-    break;
-    default:
-        // unsupported type
-        PyErr_SetString(PyExc_ValueError, "Unsupported data type.");
+    if (!(getTypeInfo(type, nptype, element_size))) {
+        PyErr_SetString(PyExc_ValueError, "Failed to get type information from dtype. Maybe unsupported type.");
         return nullptr;
     }
 
