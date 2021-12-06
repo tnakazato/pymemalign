@@ -31,10 +31,21 @@ def _get_mapped_type(dtype):
     return PYMEMALIGN_TYPEMAP.get(dtype, dtype)
 
 
+def _to_tuple(v):
+    if isinstance(v, tuple):
+        return v
+    elif hasattr(v, '__iter__'):
+        return tuple(v)
+    else:
+        return (v,)
+
+
 def empty_aligned(shape, dtype=np.float32, order='C', alignment=None):
     """
     """
-    return _pymemalign.allocate(_get_mapped_type(dtype), shape)
+    shape_tuple = _to_tuple(shape)
+    align = alignment if alignment is not None else 32
+    return _pymemalign.allocate(_get_mapped_type(dtype), shape_tuple, align)
 
 
 def empty_like_aligned(array, alignment=None):
