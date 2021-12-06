@@ -24,11 +24,11 @@
 #undef KEEP_GIL
 
 #ifdef KEEP_GIL
-# define SAKURA_BEGIN_ALLOW_THREADS {
-# define SAKURA_END_ALLOW_THREADS }
+# define BEGIN_ALLOW_THREADS {
+# define END_ALLOW_THREADS }
 #else
-# define SAKURA_BEGIN_ALLOW_THREADS Py_BEGIN_ALLOW_THREADS
-# define SAKURA_END_ALLOW_THREADS Py_END_ALLOW_THREADS
+# define BEGIN_ALLOW_THREADS Py_BEGIN_ALLOW_THREADS
+# define END_ALLOW_THREADS Py_END_ALLOW_THREADS
 #endif
 
 namespace {
@@ -36,11 +36,7 @@ namespace {
 
 
 constexpr char const kAlignedPyArrayName[] =
-#if 0
-		"AlignedPyArray.sakura.nao.ac.jp";
-#else
 		MODULE_NAME ".AlignedPyArray";
-#endif
 }
 
 extern "C" {
@@ -288,15 +284,11 @@ PyMODINIT_FUNC initpymemalign(void)
 	struct module_state *st = GETSTATE(mod);
 
 	static char excep_name[] = MODULE_NAME ".error";
-	static char excep_doc[] = "error on invoking libsakura functions";
-	auto sakura_error = st->error;
-	sakura_error = PyErr_NewExceptionWithDoc(excep_name, excep_doc, nullptr,
+	static char excep_doc[] = "error on invoking pymemalign functions";
+	auto py_error = st->error;
+	py_error = PyErr_NewExceptionWithDoc(excep_name, excep_doc, nullptr,
 			nullptr);
-//	if (sakura_error != nullptr) {
-//		Py_INCREF(sakura_error);
-//		PyModule_AddObject(mod, "error", sakura_error);
-//	}
-	if (sakura_error == NULL) {
+	if (py_error == NULL) {
 		DecrementRef(mod);
 		INITERROR;
 	}
