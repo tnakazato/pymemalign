@@ -10,12 +10,9 @@
 
 /*
  * Refer to following documents:
- * http://docs.python.jp/2/extending/extending.html
- * http://docs.python.jp/2/c-api/capsule.html
- * http://docs.python.jp/2/c-api/arg.html
- *
- * Refer to following documents for Python 3 support:
- * https://docs.python.org/3.5/howto/cporting.html
+ * https://docs.python.org/3/extending/extending.html
+ * https://docs.python.org/3/c-api/capsule.html
+ * https://docs.python.org/3/c-api/arg.html
  *
  */
 
@@ -49,18 +46,10 @@ struct module_state {
 	PyObject *error;
 };
 
-#if PY_MAJOR_VERSION >= 3
 #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
 
 #define LONG_FROM_SSIZE_T(s) PyLong_FromSsize_t(s)
 #define ASLONG(s) PyLong_AsLong(s)
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-
-#define LONG_FROM_SSIZE_T(s) PyInt_FromSsize_t(s)
-#define ASLONG(s) PyInt_AsLong(s)
-#endif
 
 void DecrementRef(PyObject *obj) {
 	Py_XDECREF(obj);
@@ -233,8 +222,6 @@ PyDoc_STRVAR(module_doc, "Python wrapper for posix_memalign.");
 
 extern "C" {
 
-#if PY_MAJOR_VERSION >= 3
-
 static int module_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
 	return 0;
@@ -260,20 +247,8 @@ static struct PyModuleDef moduledef = {
 #define INITERROR return NULL
 
 PyMODINIT_FUNC
-PyInit__pymemalign(void)
-
-#else
-
-#define INITERROR return
-
-PyMODINIT_FUNC initpymemalign(void)
-#endif
-		{
-#if PY_MAJOR_VERSION >= 3
+PyInit__pymemalign(void) {
 	PyObject *mod = PyModule_Create(&moduledef);
-#else
-	PyObject *mod = Py_InitModule3(MODULE_NAME, module_methods, module_doc);
-#endif
 	if (mod == nullptr) {
 		INITERROR;
 	}
@@ -293,9 +268,7 @@ PyMODINIT_FUNC initpymemalign(void)
 		INITERROR;
 	}
 
-#if PY_MAJOR_VERSION >= 3
 	return mod;
-#endif
 }
 
 }
