@@ -24,6 +24,9 @@ setuptools.setup(
     classifiers=[
     ],
     install_requires=['numpy'],
+    extras_require={
+        'test': ["pytest", "memory_profiler"],
+    },
     package_dir={'pymemalign': 'src'},
     packages=['pymemalign'],
     python_requires='>=3.6',
