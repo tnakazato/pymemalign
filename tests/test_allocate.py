@@ -1,8 +1,22 @@
+import gc
+import time
 import unittest
 
+import memory_profiler
 import numpy as np
 
 import pymemalign
+
+
+def _allocate_large_mem(length, dtype):
+    time.sleep(1)
+    arr = pymemalign.empty_aligned(shape=length, dtype=dtype)
+    arr[:] = 0
+    time.sleep(1)
+    del arr
+    time.sleep(1)
+    gc.collect()
+    time.sleep(1)
 
 
 class TestAllocation(unittest.TestCase):
@@ -112,3 +126,16 @@ class TestAllocation(unittest.TestCase):
         expected = np.complex128
         types_tested = [np.complex128]
         self.__test_allocate(shape, types_tested, expected)
+
+    def test_memory_leak(self):
+        """Test memory leak"""
+        gc.collect()
+        mem_profile = memory_profiler.memory_usage((_allocate_large_mem, (10 ** 7, np.float64,),))
+        mem_max = max(mem_profile)
+        mem_start = mem_profile[0]
+        mem_end = mem_profile[-1]
+        print(f'mem_start={mem_start}, mem_end={mem_end}, mem_max={mem_max}')
+        incr = mem_max - mem_start
+        diff = abs((mem_end - mem_start) / mem_start)
+        self.assertGreater(incr, 50)
+        self.assertLess(diff, 0.1)
