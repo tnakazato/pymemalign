@@ -1,5 +1,5 @@
-# Copyright (C) 2021
-# National Astronomical Observatory of Japan
+# Copyright (C) 2021-2022
+# Inter-University Research Institute Corporation, National Institutes of Natural Sciences
 # 2-21-1, Osawa, Mitaka, Tokyo, 181-8588, Japan.
 #
 # This file is part of pymemalign.
